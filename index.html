@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>100‑дневный домашний тренировочный план для женщин</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Preload фоновых изображений -->
+    <link rel="preload" as="image" href="images/motiv1.jpg">
+    <link rel="preload" as="image" href="images/motiv2.jpg">
+    <link rel="preload" as="image" href="images/motiv3.jpg">
+
+    <style>
+        :root{
+            --primary:#c2185b;
+            --primary-dark:#8c0d3a;
+            --bg:#fdf5f8;
+            --card:#ffffff;
+            --muted:#666;
+            --border:#ddd;
+            --shadow: rgba(0,0,0,0.08);
+            --rest-bg:#fff3cd;
+            --rest-text:#856404;
+            --done:#16a34a;
+            --run-bg: #e3f2fd;
+            --run-text: #0d47a1;
+        }
+        *{ box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: var(--bg);
+        }
+
+        /* ===== BG SLIDESHOW ===== */
+        .bg-slideshow{
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            overflow: hidden;
+            background: linear-gradient(120deg, #f8bbd0, #f48fb1); /* женственный градиент */
+        }
+        .bg-slide{
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center center;
+            filter: saturate(1.05) contrast(1.05) brightness(0.9);
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+        .bg-slide.active{ opacity: 1; }
+        .bg-overlay{
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(1px);
+        }
+        @media (prefers-reduced-motion: reduce){
+            .bg-slide{ transition: none; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 1rem;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+        h1 { margin: 0; font-size: 1.8rem; }
+        nav a {
+            color: white;
+            margin: 0 10px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        nav a:hover { text-decoration: underline; }
+
+        /* лёгкая прозрачность, чтобы был виден фон */
+        section {
+            background: rgba(255,255,255,0.92);
+            margin: 1.2rem 0;
+            padding: 1.2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+        .phase-section { margin: 1rem 0; }
+        .phase-header {
+            background: #fce4ec;
+            padding: 12px;
+            border-left: 5px solid var(--primary);
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .phase-header:hover { background: #f8bbd0; }
+        .phase-header span.arrow { margin-left: 8px; }
+        .phase-body { display: none; margin-top: 0.5rem; }
+        .day-card {
+            margin: 0.8rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease;
+            background: rgba(255,255,255,0.95);
+        }
+        .day-card:hover { box-shadow: 0 2px 10px var(--shadow); }
+        .day-header {
+            background: #f5f5f5;
+            padding: 10px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .day-header:hover { background: #ececec; }
+        .day-header.rest-day {
+            background: var(--rest-bg);
+            color: var(--rest-text);
+        }
+        .day-header.run-day {
+            background: var(--run-bg);
+            color: var(--run-text);
+        }
+        .day-header .left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .day-header .right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .day-header .arrow { font-weight: 700; }
+        .day-header.done {
+            border-left: 4px solid var(--done);
+        }
+        .done-checkbox {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        .day-body {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+            background: transparent;
+        }
+        .day-body.open {
+            padding: 10px 12px;
+            max-height: 1000px;
+        }
+        .exercise-row {
+            display: flex;
+            align-items: center;
+            padding: 0.55rem 0;
+            border-bottom: 1px dashed #eee;
+            gap: 0.5rem;
+        }
+        .exercise-row:last-child { border-bottom: none; }
+        .exercise-name { flex: 2; font-weight: 500; }
+        .exercise-input {
+            flex: 0.8;
+            padding: 0.4rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .note-input {
+            flex: 1.5;
+            padding: 0.4rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .rest-message, .run-message {
+            text-align: center;
+            color: var(--muted);
+            font-style: italic;
+            padding: 0.6rem 0.2rem;
+        }
+        .progress-section {
+            background: rgba(252,228,236,0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 0.8rem 0;
+            border: 1px solid #f8bbd0;
+        }
+        .progress-bar {
+            background: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        .progress-fill {
+            background: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .save-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .save-button:hover { background: var(--primary-dark); }
+        .muted { color: var(--muted); }
+
+        @media (max-width: 768px) {
+            .exercise-row { flex-direction: column; align-items: stretch; }
+            .exercise-name, .exercise-input, .note-input { width: 100%; margin: 0.2rem 0; }
+            h1 { font-size: 1.4rem; }
+            .phase-header, .day-header { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Фоновое слайд-шоу -->
+<div id="bg-slideshow" class="bg-slideshow" aria-hidden="true"></div>
+<div class="bg-overlay" aria-hidden="true"></div>
+
+<header>
+    <h1>🌸 100‑дневный домашний фитнес-план</h1>
+    <nav>
+        <a href="#phases">Фазы</a> •
+        <a href="#tips">Советы</a> •
+        <a href="#progress">Прогресс</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <section id="intro">
+        <h2>Структура плана</h2>
+        <p>Специальная трёхфазная программа для женщин 40+ с акцентом на домашние тренировки с минимальным оборудованием. Ежедневные пробежки 3-5 км включены в план.</p>
+        <ul>
+            <li><strong>Фаза 1 (дни 1–30):</strong> Адаптация — лёгкие упражнения, 12–15 повторений, подготовка мышц.</li>
+            <li><strong>Фаза 2 (дни 31–70):</strong> Интенсификация — увеличение сложности, 8–12 повторений, работа с тонусом.</li>
+            <li><strong>Фаза 3 (дни 71–100):</strong> Преображение — круговые тренировки, работа на рельеф и выносливость.</li>
+        </ul>
+        <p class="muted">План адаптирован для домашних условий с использованием подручных средств вместо тренажеров.</p>
+    </section>
+
+    <section id="progress">
+        <h2>📊 Ваш прогресс</h2>
+        <div class="progress-section">
+            <p>Завершено дней: <span id="completed-days">0</span> из 100</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">0% выполнено</p>
+            <button class="save-button" onclick="saveState()">
+                💾 Сохранить прогресс
+            </button>
+        </div>
+    </section>
+
+    <section id="phases">
+        <h2>📋 Тренировочные фазы</h2>
+
+        <div class="phase-section">
+            <div class="phase-header" onclick="togglePhase(this)">
+                📌 Фаза 1: Адаптация (Дни 1–30)
+                <span class="arrow">▶</span>
+            </div>
+            <div class="phase-body" id="phase1-body"></div>
+        </div>
+
+        <div class="phase-section">
+            <div class="phase-header" onclick="togglePhase(this)">
+                💪 Фаза 2: Интенсификация (Дни 31–70)
+                <span class="arrow">▶</span>
+            </div>
+            <div class="phase-body" id="phase2-body"></div>
+        </div>
+
+        <div class="phase-section">
+            <div class="phase-header" onclick="togglePhase(this)">
+                ✨ Фаза 3: Преображение (Дни 71–100)
+                <span class="arrow">▶</span>
+            </div>
+            <div class="phase-body" id="phase3-body"></div>
+        </div>
+    </section>
+
+    <section id="tips">
+        <h2>💡 Советы для женщин 40+</h2>
+        <ul>
+            <li><strong>Питание:</strong> сбалансированное питание с акцентом на белок (1.6–2.2 г/кг), кальций и витамин D.</li>
+            <li><strong>Вода:</strong> 30–40 мл/кг массы тела для поддержания гидратации и здоровья кожи.</li>
+            <li><strong>Сон:</strong> не менее 7–8 часов для восстановления и гормонального баланса.</li>
+            <li><strong>Безопасность:</strong> прислушивайтесь к своему телу, избегайте упражнений, вызывающих дискомфорт в суставах.</li>
+            <li><strong>Бег:</strong> носите качественные беговые кроссовки и следите за техникой бега для предотвращения травм.</li>
+            <li><strong>Дыхание:</strong> не задерживайте дыхание во время упражнений, это особенно важно для женщин 40+.</li>
+            <li>Ведите дневник тренировок и питания. Делайте фото прогресса каждые 2 недели.</li>
+        </ul>
+    </section>
+
+</div>
+
+<script>
+    // ===== ФОНОВОЕ СЛАЙД-ШОУ =====
+    const bgImages = [
+        'images/motiv1.jpg',
+        'images/motiv2.jpg',
+        'images/motiv3.jpg'
+    ];
+    const BG_INTERVAL = 8000; // мс
+
+    function setupBackgroundSlideshow(){
+        const wrap = document.getElementById('bg-slideshow');
+        if (!wrap) return;
+
+        // создаём слайды
+        bgImages.forEach(src => {
+            const slide = document.createElement('div');
+            slide.className = 'bg-slide';
+            slide.style.backgroundImage = `url("${src}")`;
+            wrap.appendChild(slide);
+        });
+
+        const slides = wrap.querySelectorAll('.bg-slide');
+        if (slides.length === 0) return;
+
+        // предварительная загрузка
+        slides.forEach(s => { const img = new Image(); img.src = s.style.backgroundImage.slice(5, -2); });
+
+        let i = 0;
+        slides[i].classList.add('active');
+        setInterval(() => {
+            slides[i].classList.remove('active');
+            i = (i + 1) % slides.length;
+            slides[i].classList.add('active');
+        }, BG_INTERVAL);
+    }
+
+    // ===== ДАННЫЕ ПЛАНА =====
+    const workoutPlan = {
+        phase1: {
+            "Вторник": [
+                "Приседания без веса (3×15)",
+                "Выпады на месте (3×12 на каждую ногу)",
+                "Ягодичный мостик (3×15)",
+                "Отжимания от стены (3×12)",
+                "Тяга бутылок с водой к поясу (3×12)",
+                "Планка на коленях (3×30 сек)"
+            ],
+            "Среда": [
+                "Ежедневная пробежка 3-5 км в комфортном темпе",
+                "Растяжка мышц ног и спины (10-15 мин)"
+            ],
+            "Пятница": [
+                "Приседания с бутылкой воды (3×12)",
+                "Подъемы на носки (3×15)",
+                "Подъемы ног лежа на боку (3×12 на каждую сторону)",
+                "Отжимания от стула (3×10)",
+                "Разведение рук с бутылками воды (3×12)",
+                "Скручивания лежа (3×15)"
+            ],
+            "Суббота": [
+                "Ежедневная пробежка 3-5 км в комфортном темпе",
+                "Растяжка всего тела (10-15 мин)"
+            ],
+            "Воскресенье": [
+                "Прогулка на свежем воздухе 60 мин",
+                "Йога для начинающих (20-30 мин)"
+            ]
+        },
+        phase2: {
+            "Вторник": [
+                "Приседания с сумкой (4×10)",
+                "Выпады в движении (3×10/ногу)",
+                "Ягодичный мостик на одной ноге (3×10/ногу)",
+                "Отжимания от пола с колен (4×8-10)",
+                "Тяга сумки к поясу в наклоне (4×10)",
+                "Боковая планка (3×20 сек на сторону)"
+            ],
+            "Среда": [
+                "Ежедневная пробежка 3-5 км с ускорениями",
+                "Растяжка и foam rolling (10-15 мин)"
+            ],
+            "Пятница": [
+                "Болгарские выпады с опорой на стул (4×10/ногу)",
+                "Подъемы таза с опорой на диван (4×12)",
+                "Отжимания с узкой постановкой рук (4×8-10)",
+                "Разведение рук с эспандером (4×12)",
+                "Подъемы ног лежа (4×12)",
+                "Велосипед для пресса (3×20)"
+            ],
+            "Суббота": [
+                "Ежедневная пробежка 3-5 км в комфортном темпе",
+                "Растяжка и мобильность суставов (10-15 мин)"
+            ],
+            "Воскресенье": [
+                "Активное восстановление: йога или плавание 30–45 мин"
+            ]
+        },
+        phase3: {
+            "Вторник": [
+                "Круговая тренировка: Приседания (45 сек) + Отжимания (45 сек) + Ягодичный мостик (45 сек) - 3 круга",
+                "Выпады назад (3×12/ногу)",
+                "Подъемы на ступеньку (3×15/ногу)",
+                "Тяга самодельных гантелей в наклоне (3×12)"
+            ],
+            "Среда": [
+                "Ежедневная пробежка 3-5 км с интервалами",
+                "Растяжка и foam rolling (10-15 мин)"
+            ],
+            "Пятница": [
+                "Суперсет: Приседания с сумкой (4×10) + Подъемы на носки (4×15)",
+                "Суперсет: Отжимания (4×8-10) + Тяга эспандера (4×10)",
+                "Суперсет: Подъемы ног (4×12) + Скручивания (4×15)",
+                "Планка с попеременным подтягиванием колен (3×10/сторону)"
+            ],
+            "Суббота": [
+                "Ежедневная пробежка 3-5 км в комфортном темпе",
+                "Растяжка и йога (15-20 мин)"
+            ],
+            "Воскресенье": [
+                "Глубокая растяжка всего тела",
+                "Медитация или дыхательные практики (10-15 мин)"
+            ]
+        }
+    };
+
+    // ===== СОСТОЯНИЕ И ХРАНИЛИЩЕ =====
+    const STORAGE_KEY = 'homeWorkout100_data_v1';
+    let state = { days: {} };
+
+    function loadState() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && typeof parsed === 'object') {
+                    state = { days: parsed.days || {} };
+                }
+            }
+        } catch(e) {
+            console.warn('Не удалось загрузить данные:', e);
+        }
+    }
+
+    function saveState() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            const btn = document.querySelector('.save-button');
+            if (!btn) return;
+            const original = btn.textContent;
+            btn.textContent = '✅ Сохранено';
+            setTimeout(() => btn.textContent = original, 1200);
+        } catch(e) {
+            alert('Не удалось сохранить прогресс в браузере.');
+        }
+    }
+
+    // ===== УТИЛИТЫ =====
+    function getWeekDay(dayNumber) {
+        const days = ["Понедельник","Вторник","Среда","Четверг","Пятница","Суббота","Воскресенье"];
+        return days[dayNumber % 7];
+    }
+    
+    function isRestWeekDay(weekDay) {
+        return weekDay === "Понедельник" || weekDay === "Четверг";
+    }
+    
+    function isRunDay(weekDay) {
+        return weekDay === "Среда" || weekDay === "Суббота";
+    }
+    
+    function getDayPlan(dayNumber, phaseName) {
+        const weekDay = getWeekDay(dayNumber);
+        if (isRestWeekDay(weekDay)) {
+            return { weekDay, rest: true, run: false, exercises: ["ОТДЫХ — полное восстановление"] };
+        }
+        if (isRunDay(weekDay)) {
+            return { weekDay, rest: false, run: true, exercises: ["Ежедневная пробежка 3-5 км"] };
+        }
+        const plan = workoutPlan[phaseName] || {};
+        const list = plan[weekDay] || [];
+        return { weekDay, rest: false, run: false, exercises: list.length ? list : ["Программа не определена для этого дня"] };
+    }
+    
+    function ensureDayState(day, exerciseCount) {
+        if (!state.days[day]) {
+            state.days[day] = { completed: false, entries: Array.from({length: exerciseCount}, () => ({w:'', n:''})) };
+        } else {
+            const current = state.days[day].entries || [];
+            if (current.length !== exerciseCount) {
+                const next = Array.from({length: exerciseCount}, (_, i) => current[i] || {w:'', n:''});
+                state.days[day].entries = next;
+            }
+        }
+    }
+    
+    function updateProgressUI() {
+        const completed = Object.values(state.days).filter(d => d.completed).length;
+        const percent = Math.round((completed / 100) * 100);
+        document.getElementById('completed-days').textContent = completed;
+        document.getElementById('progress-fill').style.width = percent + '%';
+        document.getElementById('progress-text').textContent = percent + '% выполнено';
+    }
+    
+    function togglePhase(el) {
+        const body = el.nextElementSibling;
+        const arrow = el.querySelector('.arrow');
+        const opened = body.style.display === 'block';
+        body.style.display = opened ? 'none' : 'block';
+        arrow.textContent = opened ? '▶' : '▼';
+    }
+    
+    function toggleDayBody(header) {
+        const body = header.nextElementSibling;
+        const arrow = header.querySelector('.arrow');
+        const isOpen = body.classList.contains('open');
+        body.classList.toggle('open', !isOpen);
+        arrow.textContent = isOpen ? '▶' : '▼';
+    }
+
+    // ===== ГЕНЕРАЦИЯ ДНЕЙ =====
+    function generateDays(phaseName, startDay, endDay, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        for (let day = startDay; day <= endDay; day++) {
+            const { weekDay, rest, run, exercises } = getDayPlan(day, phaseName);
+
+            ensureDayState(day, rest || run ? 0 : exercises.length);
+            const dayState = state.days[day];
+
+            const card = document.createElement('div');
+            card.className = 'day-card';
+
+            const header = document.createElement('div');
+            header.className = 'day-header' + 
+                (rest ? ' rest-day' : '') + 
+                (run ? ' run-day' : '') + 
+                (dayState.completed ? ' done' : '');
+
+            const left = document.createElement('div');
+            left.className = 'left';
+            left.textContent = `День ${day} — ${weekDay}`;
+
+            const right = document.createElement('div');
+            right.className = 'right';
+
+            const doneLabel = document.createElement('label');
+            doneLabel.className = 'done-checkbox';
+            const doneInput = document.createElement('input');
+            doneInput.type = 'checkbox';
+            doneInput.checked = !!dayState.completed;
+            doneInput.addEventListener('click', (e) => e.stopPropagation());
+            doneInput.addEventListener('change', (e) => {
+                state.days[day].completed = e.target.checked;
+                header.classList.toggle('done', e.target.checked);
+                updateProgressUI();
+                saveState();
+            });
+            const doneText = document.createElement('span');
+            doneText.textContent = 'Сделано';
+            doneLabel.appendChild(doneInput);
+            doneLabel.appendChild(doneText);
+
+            const arrow = document.createElement('span');
+            arrow.className = 'arrow';
+            arrow.textContent = '▶';
+
+            right.appendChild(doneLabel);
+            right.appendChild(arrow);
+
+            header.appendChild(left);
+            header.appendChild(right);
+            header.addEventListener('click', () => toggleDayBody(header));
+
+            const body = document.createElement('div');
+            body.className = 'day-body';
+
+            if (rest) {
+                const msg = document.createElement('div');
+                msg.className = 'rest-message';
+                msg.textContent = exercises[0];
+                body.appendChild(msg);
+            } else if (run) {
+                const msg = document.createElement('div');
+                msg.className = 'run-message';
+                msg.textContent = exercises[0];
+                body.appendChild(msg);
+            } else {
+                exercises.forEach((exercise, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'exercise-row';
+
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'exercise-name';
+                    nameDiv.textContent = exercise;
+
+                    const weightInput = document.createElement('input');
+                    weightInput.className = 'exercise-input';
+                    weightInput.type = 'number';
+                    weightInput.inputMode = 'decimal';
+                    weightInput.min = '0';
+                    weightInput.step = '0.5';
+                    weightInput.placeholder = 'вес, кг';
+                    weightInput.value = state.days[day].entries[idx]?.w || '';
+                    weightInput.addEventListener('input', () => {
+                        state.days[day].entries[idx] = state.days[day].entries[idx] || {w:'', n:''};
+                        state.days[day].entries[idx].w = weightInput.value;
+                        saveState();
+                    });
+
+                    const noteInput = document.createElement('input');
+                    noteInput.className = 'note-input';
+                    noteInput.type = 'text';
+                    noteInput.placeholder = 'результат / заметка';
+                    noteInput.value = state.days[day].entries[idx]?.n || '';
+                    noteInput.addEventListener('input', () => {
+                        state.days[day].entries[idx] = state.days[day].entries[idx] || {w:'', n:''};
+                        state.days[day].entries[idx].n = noteInput.value;
+                        saveState();
+                    });
+
+                    row.appendChild(nameDiv);
+                    row.appendChild(weightInput);
+                    row.appendChild(noteInput);
+
+                    body.appendChild(row);
+                });
+            }
+
+            card.appendChild(header);
+            card.appendChild(body);
+            container.appendChild(card);
+        }
+    }
+
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    document.addEventListener('DOMContentLoaded', () => {
+        setupBackgroundSlideshow();
+        loadState();
+        generateDays('phase1', 1, 30, 'phase1-body');
+        generateDays('phase2', 31, 70, 'phase2-body');
+        generateDays('phase3', 71, 100, 'phase3-body');
+        updateProgressUI();
+    });
+</script>
+
+</body>
+</html>
