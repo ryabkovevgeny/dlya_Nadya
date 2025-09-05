@@ -1,3 +1,6 @@
+Вот полный код с переносом дней отдыха на вторник и субботу.
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -495,8 +498,9 @@
         return days[dayNumber % 7];
     }
     
+    // Перенесли дни отдыха на Вторник и Субботу
     function isRestWeekDay(weekDay) {
-        return weekDay === "Понедельник" || weekDay === "Четверг";
+        return weekDay === "Вторник" || weekDay === "Суббота";
     }
     
     function isRunDay(weekDay) {
@@ -681,3 +685,4 @@
 
 </body>
 </html>
+```
